@@ -27,12 +27,10 @@ class Vk_agent:
         resp = requests.get(vk_url, params={**self.params, **params}).json()
         url_likes = {}
         info_dict = {}
-        el = 0
-        for val in resp['response']['items']:
-            url_likes[val['sizes'][-1]['url']] = str(val['likes']['count'])
-            el += 1
-            info_dict[f'file name_{el}'] = f'{str(val["likes"]["count"])}.jpg'
-            info_dict[f'size_{el}'] = {'height': val['sizes'][-1]['height'], 'width': val['sizes'][-1]['width']}
+        for n, val in enumerate(resp['response']['items']):
+            url_likes[f"{str(val['likes']['count'])}({n+1})"] = val['sizes'][-1]['url']
+            info_dict[f'file name_{n+1}'] = f'{str(val["likes"]["count"])}({n+1}).jpg'
+            info_dict[f'size_{n+1}'] = {'height': val['sizes'][-1]['height'], 'width': val['sizes'][-1]['width']}
         with open('info.json', 'w', encoding='utf-8') as file:
             json.dump(info_dict, file, indent=2)
         return url_likes
@@ -48,7 +46,7 @@ class Vk_agent:
         headers = {'Content-Type': 'application/json', 'Authorization': f'OAuth {y_token}'}
         requests.put(link, headers=headers, params={'path': 'vk_photos'})
         for key, val in user_1.get_photo_likes_vk().items():
-            params = {'path': f"/vk_photos/{val}", 'url': key}
+            params = {'path': f"/vk_photos/{key}", 'url': val}
             requests.post(link_1, headers=headers, params=params)
         print("Загрузка завершена!")
 
